@@ -7,9 +7,10 @@ double calculate_offset(const cv::Mat & frame) {
     
     const auto lines = LineDetector::DetectDashLines(frame);
     const std::vector<double> distances = LineDetector::GetDistancesToLines(lines);
-    
+
     ///TODO: calculate the offset
-    const double offset = distances[0];
+    const auto pmin = std::min(distances.begin(), distances.end()); // warning: this is bullshit
+    const double offset = (pmin != distances.end()) ? *pmin : 1337;
 
     return offset;
 }
