@@ -6,6 +6,12 @@ Build:
 meson setup build
 meson compile -C build
 ```
+or
+```
+mkdir build && cd build
+cmake ..
+make
+```
 Run:
 ```
 ./build/RTSoftSummerSchool2021-practice
