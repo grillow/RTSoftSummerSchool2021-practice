@@ -3,12 +3,15 @@
 #include "LineDetector.hpp"
 
 
-double distance_to_dash_line(const cv::Mat & frame) {
+double calculate_offset(const cv::Mat & frame) {
     
-    const auto line = LineDetector::DetectDashLine(frame);
-    const double distance = LineDetector::GetDistanceToLine(line);
+    const auto lines = LineDetector::DetectDashLines(frame);
+    const std::vector<double> distances = LineDetector::GetDistancesToLines(lines);
     
-    return distance;
+    ///TODO: calculate the offset
+    const double offset = distances[0];
+
+    return offset;
 }
 
 
@@ -21,7 +24,7 @@ auto main() -> int {
     cv::VideoCapture cap(0);
     cv::Mat frame;
     while (cap.read(frame)) {
-        const double distance = distance_to_dash_line(frame);
+        const double distance = calculate_offset(frame);
         controller.Move(distance);
     }
 

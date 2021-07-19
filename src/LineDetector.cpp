@@ -4,15 +4,17 @@
 namespace LineDetector {
     
     ///TODO: do
-    std::vector<cv::Point> DetectDashLine(const cv::Mat & frame) {
+    std::vector<std::vector<cv::Point>> DetectDashLines(
+            const cv::Mat & frame) {
         (void)frame;
         return {};
     }
 
     ///TODO: do
-    double GetDistanceToLine(const std::vector<cv::Point> & line) {
-        (void)line;
-        return 0;
+    std::vector<double> GetDistancesToLines(
+            const std::vector<std::vector<cv::Point>> & lines) {
+        (void)lines;
+        return { 0 };
     }
 
 }
