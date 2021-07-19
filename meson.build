@@ -14,7 +14,8 @@ opencv = dependency('opencv')
 
 executable('RTSoftSummerSchool2021-practice',
   [
-    'src/main.cpp'
+    'src/main.cpp',
+    'src/LineDetector.cpp'
   ],
   dependencies:
   [
