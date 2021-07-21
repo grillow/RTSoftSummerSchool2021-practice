@@ -36,7 +36,7 @@ namespace LineDetector {
         cv::bitwise_and(edged, mask, masked_edges);
 
         std::vector<cv::Vec4i> linesP;
-        cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 50, 50);
+        cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 135, 50);
         std::vector<std::pair<cv::Point, cv::Point>> lines;
         std::transform(linesP.begin(), linesP.end(), std::back_inserter(lines),
             [](const auto & line) {
@@ -44,6 +44,7 @@ namespace LineDetector {
                 { {line[0], line[1]}, {line[2], line[3]} };
             }
         );
+
 
         cv::Mat lines_edges(size, CV_8UC3);
         for (const auto & line : lines) {
@@ -63,7 +64,7 @@ namespace LineDetector {
         cv::imshow("mask", mask);
         cv::imshow("masked_edges", masked_edges);
         cv::imshow("lines_edges", lines_edges);
-        cv::waitKey();
+        cv::waitKey(0);
 
         return lines;
     }
