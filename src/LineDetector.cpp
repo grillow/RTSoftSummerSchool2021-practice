@@ -45,7 +45,7 @@ namespace LineDetector {
             }
         );
 
-
+        /*
         cv::Mat lines_edges(size, CV_8UC3);
         for (const auto & line : lines) {
             std::cout   << line.first.x  << " " << line.first.y
@@ -65,6 +65,7 @@ namespace LineDetector {
         cv::imshow("masked_edges", masked_edges);
         cv::imshow("lines_edges", lines_edges);
         cv::waitKey(0);
+        */
 
         return lines;
     }
