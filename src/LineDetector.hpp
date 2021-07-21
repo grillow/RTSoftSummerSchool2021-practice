@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
+#include <utility>
 #include <opencv2/opencv.hpp>
 
 
 namespace LineDetector {
     
-    std::vector<std::vector<cv::Point>> DetectRoadLines(const cv::Mat & frame);
+    std::vector<std::pair<cv::Point, cv::Point>> DetectRoadLines(const cv::Mat & frame);
     std::vector<double> GetDistancesToLines(
-            const std::vector<std::vector<cv::Point>> & lines);
-    double GetDistanceToLine(const std::vector<cv::Point> & line);
+            const std::vector<std::pair<cv::Point, cv::Point>> & lines);
+    double GetDistanceToLine(const std::pair<cv::Point, cv::Point> & line);
 
 }

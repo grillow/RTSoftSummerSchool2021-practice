@@ -1,5 +1,6 @@
 #include "LineDetector.hpp"
 #include <algorithm>
+#include <iterator>
 #include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -8,7 +9,7 @@
 
 namespace LineDetector {
 
-    std::vector<std::vector<cv::Point>> DetectRoadLines(
+    std::vector<std::pair<cv::Point, cv::Point>> DetectRoadLines(
             const cv::Mat & frame) {
 
         cv::Mat gray;
@@ -34,6 +35,26 @@ namespace LineDetector {
         cv::Mat masked_edges;
         cv::bitwise_and(edged, mask, masked_edges);
 
+        std::vector<cv::Vec4i> linesP;
+        cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 50, 50);
+        std::vector<std::pair<cv::Point, cv::Point>> lines;
+        std::transform(linesP.begin(), linesP.end(), std::back_inserter(lines),
+            [](const auto & line) {
+                return std::pair<cv::Point, cv::Point>
+                { {line[0], line[1]}, {line[2], line[3]} };
+            }
+        );
+
+        cv::Mat lines_edges(size, CV_8UC3);
+        for (const auto & line : lines) {
+            std::cout   << line.first.x  << " " << line.first.y
+                        << " "
+                        << line.second.x << " " << line.second.y
+                        << std::endl;
+
+            cv::line(lines_edges, line.first, line.second, { 0, 255, 0 });
+        }
+        std::cout << lines.size() << std::endl;
 
         cv::imshow("frame", frame);
         cv::imshow("gray", gray);
@@ -41,13 +62,14 @@ namespace LineDetector {
         cv::imshow("edged", edged);
         cv::imshow("mask", mask);
         cv::imshow("masked_edges", masked_edges);
+        cv::imshow("lines_edges", lines_edges);
         cv::waitKey();
-        return {}; ///TODO: temp
 
+        return lines;
     }
 
     std::vector<double> GetDistancesToLines(
-            const std::vector<std::vector<cv::Point>> & lines) {
+            const std::vector<std::pair<cv::Point, cv::Point>> & lines) {
 
         std::vector<double> distances;
         distances.reserve(lines.size());
@@ -59,7 +81,7 @@ namespace LineDetector {
     }
 
     ///TODO: do
-    double GetDistanceToLine(const std::vector<cv::Point> & line) {
+    double GetDistanceToLine(const std::pair<cv::Point, cv::Point> & line) {
         (void)line;
         return 0;
     }
