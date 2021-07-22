@@ -14,5 +14,5 @@ make
 ```
 Run:
 ```
-./build/RTSoftSummerSchool2021-practice data/sample-video.mp4
+./build/RTSoftSummerSchool2021-practice data/good-video.wemb
 ```
