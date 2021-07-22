@@ -1,15 +1,35 @@
-#include "LineDetector.hpp"
+#include "LineDetection.hpp"
 #include <algorithm>
 #include <iterator>
+#include <opencv2/core/matx.hpp>
+#include <stdexcept>
 #include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
 
-namespace LineDetector {
+namespace LineDetection {
 
-    std::vector<std::pair<cv::Point, cv::Point>> DetectRoadLines(
+    namespace {
+        line_t ContinueLine(const line_t & line, cv::Size size) {
+            cv::Point down, upper;
+            if (line.first.y > line.second.y) {
+                down = line.first;
+                upper = line.second;
+            } else {
+                down = line.second;
+                upper = line.first;
+            }
+            cv::Vec2d dir = cv::Vec2i(down) - cv::Vec2i(upper);
+            const double t = size.height / dir[1];
+            down = cv::Vec2i(cv::Vec2d(cv::Vec2i(upper)) + cv::Vec2d(t * dir));
+
+            return {down, upper};
+        }
+    }
+
+    std::vector<line_t> DetectRoadLines(
             const cv::Mat & frame) {
 
         cv::Mat gray;
@@ -39,10 +59,10 @@ namespace LineDetector {
         // more lines variant
         // cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 80, 50);
         cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 135, 50);
-        std::vector<std::pair<cv::Point, cv::Point>> lines;
+        std::vector<line_t> lines;
         std::transform(linesP.begin(), linesP.end(), std::back_inserter(lines),
             [](const auto & line) {
-                return std::pair<cv::Point, cv::Point>
+                return line_t
                 { {line[0], line[1]}, {line[2], line[3]} };
             }
         );
@@ -72,22 +92,41 @@ namespace LineDetector {
         return lines;
     }
 
-    std::vector<double> GetDistancesToLines(
-            const std::vector<std::pair<cv::Point, cv::Point>> & lines) {
+    std::pair<line_t, line_t> GetMainLines
+            (const std::vector<line_t> & lines, cv::Size size) {
 
-        std::vector<double> distances;
-        distances.reserve(lines.size());
+        const int w = size.width / 2;
 
-        std::transform(lines.begin(), lines.end(), std::back_inserter(distances),
-                [](const auto & line) { return GetDistanceToLine(line); });
+        bool left_found = false, right_found = false;
+        line_t left_best = lines[0];
+        line_t right_best = lines[0];
+        const auto length = [](const line_t & l) -> double {
+            return cv::norm(l.second - l.first);
+        };
 
-        return distances;
-    }
+        for (const auto & line : lines) {
+            const cv::Point a = line.first;
+            const cv::Point b = line.second;
+            if (a.x < w && b.x < w) {
+                if (!left_found || length(line) >= length(left_best)) {
+                    left_best = line;
+                    left_found = true;
+                }
+            } else if (a.x > w && b.x > w) {
+                if (!right_found || length(line) >= length(right_best)) {
+                    right_best = line;
+                    right_found = true;
+                }
+            } else {
+                continue;
+            }
 
-    ///TODO: do
-    double GetDistanceToLine(const std::pair<cv::Point, cv::Point> & line) {
-        (void)line;
-        return 0;
+        }
+
+        if (!left_found || !right_found) {
+            throw std::runtime_error("could not find suitable lines");
+        }
+        return {ContinueLine(left_best, size), ContinueLine(right_best, size)};
     }
 
 }
