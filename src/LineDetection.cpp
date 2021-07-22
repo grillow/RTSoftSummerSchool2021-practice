@@ -97,25 +97,46 @@ namespace LineDetection {
 
         const int w = size.width / 2;
 
-        bool left_found = false, right_found = false;
-        line_t left_best = lines[0];
-        line_t right_best = lines[0];
-        const auto length = [](const line_t & l) -> double {
-            return cv::norm(l.second - l.first);
-        };
+        cv::Point   lu, ld, ru, rd;
+        bool        flu, fld, fru, frd;
+        flu = fld = fru = frd = false;
 
         for (const auto & line : lines) {
             const cv::Point a = line.first;
             const cv::Point b = line.second;
             if (a.x < w && b.x < w) {
-                if (!left_found || length(line) >= length(left_best)) {
-                    left_best = line;
-                    left_found = true;
+                if (!flu || lu.y < a.y) {
+                    lu = a;
+                    flu = true;
+                }
+                if (!flu || lu.y < b.y) {
+                    lu = b;
+                    flu = true;
+                }
+                if (!fld || ld.y > a.y) {
+                    ld = a;
+                    fld = true;
+                }
+                if (!fld || ld.y > b.y) {
+                    ld = b;
+                    fld = true;
                 }
             } else if (a.x > w && b.x > w) {
-                if (!right_found || length(line) >= length(right_best)) {
-                    right_best = line;
-                    right_found = true;
+                if (!fru || ru.y < a.y) {
+                    ru = a;
+                    fru = true;
+                }
+                if (!fru || ru.y < b.y) {
+                    ru = b;
+                    fru = true;
+                }
+                if (!frd || rd.y > a.y) {
+                    rd = a;
+                    frd = true;
+                }
+                if (!frd || rd.y > b.y) {
+                    rd = b;
+                    frd = true;
                 }
             } else {
                 continue;
@@ -123,10 +144,10 @@ namespace LineDetection {
 
         }
 
-        if (!left_found || !right_found) {
-            throw std::runtime_error("could not find suitable lines");
+        if (!flu || !fld || !fru || !frd) {
+            throw std::runtime_error("could not get suitable lines");
         }
-        return {ContinueLine(left_best, size), ContinueLine(right_best, size)};
+        return {ContinueLine({ld, lu}, size), ContinueLine({rd, ru}, size)};
     }
 
 }
