@@ -99,7 +99,7 @@ struct DefaultVisualization : Visualization {
 
 double calculate_offset(const cv::Mat & frame, Visualization & visualization) try {
     const auto lines = LineDetection::DetectRoadLines(frame);
-    visualization.DrawDetectedLines(lines);
+    // visualization.DrawDetectedLines(lines);
 
     const auto main_lines = LineDetection::GetMainLines(lines, frame.size());
     visualization.DrawMainLines(main_lines);

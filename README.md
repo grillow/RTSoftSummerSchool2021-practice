@@ -3,6 +3,7 @@
 
 ### Result
 ![good-video-result](data/good-video-result.gif)
+![good-video-day-result](data/good-video-day-result.gif)
 
 ### Build
 ##### Meson
