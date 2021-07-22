@@ -22,7 +22,7 @@ namespace LineDetection {
                 upper = line.first;
             }
             cv::Vec2d dir = cv::Vec2i(down) - cv::Vec2i(upper);
-            const double t = size.height / dir[1];
+            const double t = (size.height - upper.y) / dir[1];
             down = cv::Vec2i(cv::Vec2d(cv::Vec2i(upper)) + cv::Vec2d(t * dir));
 
             return {down, upper};
@@ -36,7 +36,7 @@ namespace LineDetection {
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
         cv::Mat blurred;
-        cv::GaussianBlur(gray, blurred, {5, 5}, 0);
+        cv::GaussianBlur(gray, blurred, {3, 3}, 0);
 
         cv::Mat edged;
         cv::Canny(blurred, edged, 100, 180);
@@ -45,10 +45,10 @@ namespace LineDetection {
         cv::Mat mask = cv::Mat::zeros(size, edged.type());
 
         const std::vector<std::vector<cv::Point>> vertices = {{
-            cv::Point { 0, size.height },
-            cv::Point { int(size.width * 0.45), int(size.height * 0.60) },
-            cv::Point { int(size.width * 0.55), int(size.height * 0.60) },
-            cv::Point { size.width, size.height }
+            cv::Point { int(size.width * 0.25), int(size.height * 1.00) },
+            cv::Point { int(size.width * 0.42), int(size.height * 0.75) },
+            cv::Point { int(size.width * 0.58), int(size.height * 0.75) },
+            cv::Point { int(size.width * 0.75), int(size.height * 1.00) }
         }};
         cv::fillPoly(mask, vertices, cv::Scalar {255, 255, 255});
 
@@ -57,7 +57,7 @@ namespace LineDetection {
 
         std::vector<cv::Vec4i> linesP;
         // more lines variant
-        cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 80, 50);
+        cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15);
         // cv::HoughLinesP(masked_edges, linesP, 20, CV_PI / 180, 15, 135, 50);
         std::vector<line_t> lines;
         std::transform(linesP.begin(), linesP.end(), std::back_inserter(lines),
@@ -67,27 +67,27 @@ namespace LineDetection {
             }
         );
 
-        /*
-        cv::Mat lines_edges(size, CV_8UC3);
-        for (const auto & line : lines) {
-            std::cout   << line.first.x  << " " << line.first.y
-                        << " "
-                        << line.second.x << " " << line.second.y
-                        << std::endl;
-
-            cv::line(lines_edges, line.first, line.second, { 0, 255, 0 });
-        }
-        std::cout << lines.size() << std::endl;
-
-        cv::imshow("frame", frame);
-        cv::imshow("gray", gray);
-        cv::imshow("blurred", blurred);
+#ifdef DEBUG
+        // cv::Mat lines_edges(size, CV_8UC3);
+        // for (const auto & line : lines) {
+        //     std::cout   << line.first.x  << " " << line.first.y
+        //                 << " "
+        //                 << line.second.x << " " << line.second.y
+        //                 << std::endl;
+        //
+        //     cv::line(lines_edges, line.first, line.second, { 0, 255, 0 });
+        // }
+        // std::cout << lines.size() << std::endl;
+        //
+        // cv::imshow("frame", frame);
+        // cv::imshow("gray", gray);
+        // cv::imshow("blurred", blurred);
         cv::imshow("edged", edged);
         cv::imshow("mask", mask);
-        cv::imshow("masked_edges", masked_edges);
-        cv::imshow("lines_edges", lines_edges);
-        cv::waitKey(0);
-        */
+        // cv::imshow("masked_edges", masked_edges);
+        // cv::imshow("lines_edges", lines_edges);
+        // cv::waitKey(0);
+#endif
 
         return lines;
     }

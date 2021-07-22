@@ -14,5 +14,5 @@ make
 ```
 Run:
 ```
-./build/RTSoftSummerSchool2021-practice data/sample-image.jpg
+./build/RTSoftSummerSchool2021-practice data/sample-video.mp4
 ```

@@ -7,7 +7,7 @@ struct PrintingMovingStrategy : MovingStrategy {
     PrintingMovingStrategy(std::ostream & out) : out(out) {}
 
     void Move(double offset) override {
-        out << "offset:" << offset << std::endl;
+        out << "offset = " << offset << std::endl;
     }
 
 private:
