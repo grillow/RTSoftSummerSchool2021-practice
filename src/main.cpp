@@ -50,13 +50,13 @@ protected:
 
 struct DefaultVisualization : Visualization {
 
-    void DrawDetectedLines(const std::vector<LineDetection::line_t> lines) {
+    void DrawDetectedLines(const std::vector<LineDetection::line_t> lines) override {
         for (const auto & line : lines) {
             cv::line(frame, line.first, line.second, {255, 255, 0}, 2);
         }
     }
 
-    void DrawMainLines(const std::pair<LineDetection::line_t, LineDetection::line_t> & lines) {
+    void DrawMainLines(const std::pair<LineDetection::line_t, LineDetection::line_t> & lines) override {
         const auto & left = lines.first;
         const auto & right = lines.second;
         cv::Mat mask = cv::Mat::zeros(frame.size(), frame.type());
@@ -65,11 +65,11 @@ struct DefaultVisualization : Visualization {
         cv::addWeighted(frame, 1, mask, 0.5, 0, frame);
     }
 
-    void DrawCenterLine(const LineDetection::line_t & line) {
+    void DrawCenterLine(const LineDetection::line_t & line) override {
         cv::line(frame, line.first, line.second, {255, 255, 255});
     }
 
-    void DrawOffset(const int position) {
+    void DrawOffset(const int position) override {
         // const int w_2 = frame.size().width / 2;
         const int h = frame.size().height;
 
