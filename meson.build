@@ -20,6 +20,5 @@ executable('RTSoftSummerSchool2021-practice',
   dependencies:
   [
     opencv
-  ],
-  install: true
+  ]
 )
