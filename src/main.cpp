@@ -23,8 +23,8 @@ struct Visualization {
     void DrawBestLines(const std::pair<LineDetection::line_t, LineDetection::line_t> & lines) {
         const auto & left = lines.first;
         const auto & right = lines.second;
-        cv::line(frame, left.first, left.second, {0, 255, 0}, 5);
-        cv::line(frame, right.first, right.second, {0, 255, 0}, 5);
+        cv::line(frame, left.first, left.second, {0, 255, 0}, 3);
+        cv::line(frame, right.first, right.second, {0, 255, 0}, 3);
     }
 
     void DrawOffset(const int position) {
@@ -32,7 +32,7 @@ struct Visualization {
         const int h = frame.size().height;
 
         cv::circle(frame, {w_2, h}, 15, {255, 255, 255}, 1);
-        cv::circle(frame, {position, h}, 15, {255, 255, 0}, 1);
+        cv::circle(frame, {position, h}, 12, {255, 0, 255}, 1);
     }
 
     void Show() {
