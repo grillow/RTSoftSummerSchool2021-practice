@@ -2,6 +2,7 @@
 #include "PrintingMovingStrategy.hpp"
 #include "LineDetection.hpp"
 #include <opencv2/core.hpp>
+#include <opencv2/core/types.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 
@@ -43,20 +44,38 @@ struct Visualization {
         cv::waitKey();
     }
 
+    void Wait(int delay) {
+        cv::waitKey(delay);
+    }
+
 private:
     cv::Mat frame;
 };
 
 
+cv::Point line_intersection(const LineDetection::line_t & a, const LineDetection::line_t & b) {
+    const cv::Point2f x = b.first - a.first;
+    const cv::Point2f d1 = a.second - a.first;
+    const cv::Point2f d2 = b.second - b.first;
+
+    const double cross = d1.x * d2.y - d1.y * d2.x;
+    const double t1 = (x.x * d2.y - x.y * d2.x) / cross;
+    if (abs(cross) < 1e-8)
+        throw std::runtime_error("could not calculate line intersection");
+
+    return cv::Point2f(a.first) + d1 * t1;
+}
+
+
 int calculate_offset(const cv::Mat & frame, Visualization & visualization) try {
     const auto lines = LineDetection::DetectRoadLines(frame);
-    const auto best_lines = LineDetection::GetMainLines(lines, frame.size());
+    const auto main_lines = LineDetection::GetMainLines(lines, frame.size());
 
-    const auto position = (best_lines.first.first.x + best_lines.second.first.x) / 2;
+    const auto position = line_intersection(main_lines.first, main_lines.second).x;
     const auto offset = position - frame.size().width / 2;
 
     visualization.DrawDetectedLines(lines);
-    visualization.DrawBestLines(best_lines);
+    visualization.DrawBestLines(main_lines);
     visualization.DrawOffset(position);
 
     return offset;
@@ -76,18 +95,18 @@ auto main(int argc, char **argv) -> int {
     controller.SetMovingStrategy(std::make_unique<PrintingMovingStrategy>(std::cout));
 
     // get a frame somehow
-    // cv::VideoCapture cap(0);
+    cv::VideoCapture cap(argv[1]);
     cv::Mat frame;
-    frame = cv::imread(argv[1], cv::IMREAD_COLOR);
-    //while (cap.read(frame)) {
+    // frame = cv::imread(argv[1], cv::IMREAD_COLOR);
+    while (cap.read(frame)) {
         visualization.SetFrame(frame);
         const double distance = calculate_offset(frame, visualization);
-        visualization.Show();
         controller.Move(distance);
-    //}
+        visualization.Show();
+        visualization.Wait();
+    }
 
     visualization.Wait();
-
 
     return 0;
 }
