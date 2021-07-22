@@ -18,7 +18,7 @@ make
 ```
 #### Run:
 ```
-./build/RTSoftSummerSchool2021-practice data/good-video.wemb
+./build/RTSoftSummerSchool2021-practice data/good-video.webm
 ```
 ### Description
 ##### Algorithm (for every frame)
