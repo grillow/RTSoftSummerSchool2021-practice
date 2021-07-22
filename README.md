@@ -26,11 +26,11 @@ make
 2. Then Gaussian blur gets applied
 3. Canny edge detection algorithm finds edges
 4. Edges get filtered via region of interest
-5. probabilistic Hough transform algorithm finds lines
-6. many detected lines get merged into two road lines
-7. central line is calculated as shown (trapezoid)
-8. the lower end of the central line should be roughly in the middle of the screen
-difference between central line's lower end and screen's middle defines vehicle's behaviour (polymorphic strategy)
+5. Probabilistic Hough transform algorithm finds lines
+6. Many detected lines get merged into two road lines
+7. Central line is calculated as shown (trapezoid)
+8. The lower end of the central line should be roughly in the middle of the screen  
+Difference between central line's lower end and screen's middle defines vehicle's behaviour (polymorphic strategy)
 
 ##### Steps of road lines detection
 ![steps](data/steps.png)
