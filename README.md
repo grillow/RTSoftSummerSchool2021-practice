@@ -1,6 +1,9 @@
 ### Task
 Разработать программу для контроля движения машинки в полосе с прирывистой дорожной разметкой используя видеопоток.
 
+##### Result
+![good-video-result](data/good-video-result.mp4)
+
 Build:
 ```
 meson setup build

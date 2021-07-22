@@ -6,17 +6,49 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 #include <string_view>
-
 
 struct Visualization {
     Visualization() {
         cv::namedWindow("visualization");
     }
 
+    virtual ~Visualization() = default;
+
     void SetFrame(const cv::Mat & frame_) {
         cv::addWeighted(frame_, 0.3, cv::Mat::zeros(frame_.size(), frame_.type()), 1, 0, frame);
     }
+
+    cv::Mat GetFrame() const {
+        return frame;
+    }
+
+    void Show() {
+        cv::imshow("visualization", frame);
+    }
+
+    void Wait() {
+        cv::waitKey();
+    }
+
+    void Wait(int delay) {
+        cv::waitKey(delay);
+    }
+
+    virtual void DrawDetectedLines(const std::vector<LineDetection::line_t> lines) = 0;
+
+    virtual void DrawMainLines(const std::pair<LineDetection::line_t, LineDetection::line_t> & lines) = 0;
+
+    virtual void DrawCenterLine(const LineDetection::line_t & line) = 0;
+
+    virtual void DrawOffset(const int position) = 0;
+
+protected:
+    cv::Mat frame;
+};
+
+struct DefaultVisualization : Visualization {
 
     void DrawDetectedLines(const std::vector<LineDetection::line_t> lines) {
         for (const auto & line : lines) {
@@ -38,30 +70,16 @@ struct Visualization {
     }
 
     void DrawOffset(const int position) {
-        const int w_2 = frame.size().width / 2;
+        // const int w_2 = frame.size().width / 2;
         const int h = frame.size().height;
 
-        const auto rw = 90;
-        const auto rh = 90;
-        const cv::Rect ok_rect = cv::Rect(w_2 - rw / 2, h - rh / 2, rw, rh);
-        cv::rectangle(frame, ok_rect, {255, 255, 255});
+        // const auto rw = 90;
+        // const auto rh = 90;
+        // const cv::Rect ok_rect = cv::Rect(w_2 - rw / 2, h - rh / 2, rw, rh);
+        // cv::rectangle(frame, ok_rect, {255, 255, 255});
         cv::circle(frame, {position, h}, 12, {255, 0, 255}, 1);
     }
 
-    void Show() {
-        cv::imshow("visualization", frame);
-    }
-
-    void Wait() {
-        cv::waitKey();
-    }
-
-    void Wait(int delay) {
-        cv::waitKey(delay);
-    }
-
-private:
-    cv::Mat frame;
 };
 
 
@@ -112,12 +130,13 @@ auto main(int argc, char **argv) -> int {
         return -1;
     }
 
-    Visualization visualization;
+    DefaultVisualization visualization;
     CarController controller;
     controller.SetMovingStrategy(std::make_unique<PrintingMovingStrategy>(std::cout));
 
     // get a frame somehow
     cv::VideoCapture cap(argv[1]);
+
     cv::Mat frame;
     while (cap.read(frame)) {
         cv::resize(frame, frame, cv::Size(1280, 720), 0, 0);
