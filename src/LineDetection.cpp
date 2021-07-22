@@ -82,8 +82,8 @@ namespace LineDetection {
         // cv::imshow("frame", frame);
         // cv::imshow("gray", gray);
         // cv::imshow("blurred", blurred);
-        cv::imshow("edged", edged);
-        cv::imshow("mask", mask);
+        // cv::imshow("edged", edged);
+        // cv::imshow("mask", mask);
         // cv::imshow("masked_edges", masked_edges);
         // cv::imshow("lines_edges", lines_edges);
         // cv::waitKey(0);
