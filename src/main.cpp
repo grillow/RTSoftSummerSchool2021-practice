@@ -21,11 +21,13 @@ struct Visualization {
             cv::line(frame, line.first, line.second, {255, 255, 0});
         }
     }
-    void DrawBestLines(const std::pair<LineDetection::line_t, LineDetection::line_t> & lines) {
+    void DrawMainLines(const std::pair<LineDetection::line_t, LineDetection::line_t> & lines) {
         const auto & left = lines.first;
         const auto & right = lines.second;
-        cv::line(frame, left.first, left.second, {0, 255, 0}, 3);
-        cv::line(frame, right.first, right.second, {0, 255, 0}, 3);
+        cv::Mat mask = cv::Mat::zeros(frame.size(), frame.type());
+        cv::line(mask, left.first, left.second, {0, 255, 0}, 7);
+        cv::line(mask, right.first, right.second, {0, 255, 0}, 7);
+        cv::addWeighted(frame, 1, mask, 0.8, 0, frame);
     }
 
     void DrawOffset(const int position) {
@@ -74,8 +76,8 @@ int calculate_offset(const cv::Mat & frame, Visualization & visualization) try {
     const auto position = line_intersection(main_lines.first, main_lines.second).x;
     const auto offset = position - frame.size().width / 2;
 
-    visualization.DrawDetectedLines(lines);
-    visualization.DrawBestLines(main_lines);
+    // visualization.DrawDetectedLines(lines);
+    visualization.DrawMainLines(main_lines);
     visualization.DrawOffset(position);
 
     return offset;
@@ -97,13 +99,12 @@ auto main(int argc, char **argv) -> int {
     // get a frame somehow
     cv::VideoCapture cap(argv[1]);
     cv::Mat frame;
-    // frame = cv::imread(argv[1], cv::IMREAD_COLOR);
     while (cap.read(frame)) {
         visualization.SetFrame(frame);
         const double distance = calculate_offset(frame, visualization);
         controller.Move(distance);
         visualization.Show();
-        visualization.Wait();
+        visualization.Wait(50);
     }
 
     visualization.Wait();
