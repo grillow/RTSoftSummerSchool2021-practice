@@ -114,13 +114,13 @@ double calculate_offset(const cv::Mat & frame, Visualization & visualization) tr
     visualization.DrawCenterLine(center_line);
 
     const int road_center = center_line.first.x;
-    const auto offset_abs= road_center - frame.size().width / 2;
+    const auto offset_abs = road_center - frame.size().width / 2;
     const double offset = offset_abs / (double)frame.size().width;
     visualization.DrawOffset(road_center);
 
     return offset;
 } catch (const std::exception & e) {
-    std::cout << e.what() << std::endl;
+    std::cerr << e.what() << std::endl;
     return 0;
 }
 
